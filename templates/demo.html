@@ -1,0 +1,53 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {
+  background-image: url("/static/images/m6.jpg");
+  background-repeat: no-repeat;
+   background-size: 100% 210%;
+}
+</style>
+</head>
+
+<body>
+<br>
+<br>
+<br>
+<br>
+<center>
+
+
+<font size="8" face="Gill Sans" color="black">
+<strong>
+MEDEX
+</strong>
+</font>
+</h1>
+<br>
+<br>
+<br>
+
+<font size="4"  face="Gill Sans" color="green">
+<form class="main" method="post"  action="{% url 'result' %}" >
+  {% csrf_token %}
+  <label for="pid">Patient ID:</label>
+  <input type="text" id="pid" name="pid"><br><br>
+  <label for="sym">Symptom:</label>
+  <input type="text" id="sym" name="sym">
+<br><br><br>
+  <input type="submit" value="Search">
+
+
+</form>
+</font>
+<br>
+<br>
+<br>
+
+</center>
+</body>
+</html>
