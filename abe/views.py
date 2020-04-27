@@ -1,7 +1,7 @@
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
-from abe.abe import outerDec
+from abe.abe1 import decryption
 
 import re
 import base64
@@ -27,12 +27,12 @@ def home_page(request):
                 print(username, password)
                 return HttpResponseRedirect('/search')
         else:
-            return render(request, "doctor login.htm", {'error': True})
-    return render(request, "doctor login.htm", {})
+            return render(request, "login.html", {'error': True})
+    return render(request, "login.html", {})
 
 
 def searchpage(request):
-    return render(request, "demo.html", {})
+    return render(request, "medex.html", {})
 
 
 def result(request):
@@ -57,7 +57,7 @@ def result(request):
         except:
             data.close()
             return render(request, 'result.html', {'ans': "file not found"})
-        outerDec("./media/"+pid+".txt")
+        decryption("./media/"+pid+".txt",symptom)
 
         data.close()
 
