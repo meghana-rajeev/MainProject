@@ -1,17 +1,12 @@
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
-from abe.abe1 import decryption
+from abe.sample1 import decryption
 
-import re
-import base64
-import os
-import hashlib
+
 import boto3
 import botocore
 
-from django.contrib.auth.decorators import login_required
-# Create your views here.
 
 def home_page(request):
 
@@ -54,15 +49,17 @@ def result(request):
         data = open("./media/"+pid+".txt", 'wb')
         try:
             bucket.download_fileobj(pid+".txt", data)
+            print("hi")
         except:
             data.close()
-            return render(request, 'result.html', {'ans': "file not found"})
-        decryption("./media/"+pid+".txt",symptom)
+            #return render(request, 'result.html', {'ans': "file not found"})
+        #decryption("./media/"+pid+".txt",symptom)
 
         data.close()
 
 
         print(patientid, symptom)
-        return render(request, 'result.html', {'ans': patientid + " " + symptom})
+        return render(request, 'result.html', {'ans': patientid + "with " + symptom})
+        #return render(request, 'result.html', {'ans': patientid })
     return render(request, 'result.html', {})
 

@@ -3,7 +3,7 @@ import base64
 import os
 import hashlib
 import boto3
-#import sys
+import sys
 
 from Crypto.Cipher import AES
 from Crypto import Random
@@ -106,7 +106,7 @@ def innerKeyGen(input):
                     ke = i[r1 + 1:r2]
                     ke = re.sub(r'\W+', '', ke)
                     kli.append(ke)
-    print("kli: ", kli)
+    print(("kli: ", kli))
     myfile.close()
     # innerEnc(input, kli)
 
@@ -117,7 +117,7 @@ def innerEnc(input, kli):
     mylines = []
     c = -1
 
-    fk = open("KeyFile.txt", 'a+')
+    fk = open("KeyFile.txt", "wb")
 
     with open(input, 'r+') as myfile:
         for myline in myfile:  # For each line, stored as myline,
@@ -170,8 +170,8 @@ def innerEnc(input, kli):
 
                 key = base64.urlsafe_b64encode(kdf.derive(password_en))  # Can only use kdf once
                 innerkeyli.append(key)
-                fk.write(key.decode())
-                fk.write(",")
+                fk.write(key)
+                fk.write(",".encode())
                 fernet = Fernet(key)
                 # print("value of j=", j)
                 data = x.encode()
@@ -193,7 +193,7 @@ def innerEnc(input, kli):
             rl.append(x)
 
     f.writelines(rl)
-    fk.write("\n")
+    fk.write("\n".encode())
     f.close()
     fk.close()
 
@@ -261,7 +261,7 @@ def decryption(file, symlist):
             ln += 1
             if ln == (num - 1):
                 pass_string = p[:-1]
-        print("Outerkey :", pass_string)
+        print(("Outerkey :", pass_string))
 
         # num = int(file[1:6])
         # pass_string = keys[num - 1]
@@ -299,12 +299,17 @@ def decryption(file, symlist):
         fk = open("KeyFile.txt", "r")
         x = fk.readlines()
 
-        print("nu: ", nu)
-        for p in x:
-            ln += 1
-            if ln == (nu - 1):
-                innerkeyli = p.split(",")
-        print("Innerkeyli :", innerkeyli)
+        print(("nu: ", nu))
+        #for p in x:
+            #ln += 1
+            #print("ln: ",ln)
+            #if ln == (nu - 1):
+                #p = p.decode()
+                #print("p: "+p)
+                #innerkeyli = p.split(",")
+        #p = x[nu-1]
+        innerkeyli = x.split(",")
+        print(("Innerkeyli :", innerkeyli))
 
         f2 = open(output, "wb")
         f1 = open(file, 'rb')
@@ -318,7 +323,7 @@ def decryption(file, symlist):
                     # if line.find(sym) >= 0:
                     if sym.lower().encode() in line.lower():
                         paranum.append(co - 1)
-                        print("Symptom Found! Val of co = ", co)
+                        print(("Symptom Found! Val of co = ", co))
                 co += 5
 
         co = c
@@ -327,10 +332,8 @@ def decryption(file, symlist):
             lin += 1
             if co in paranum:
                 if lin == (co + j):
-                    print("co: ", co, "j: ", j, "i: ", i)
+                    print(("co: ", co, "j: ", j, "i: ", i))
                     if j == 2:
-
-                        #enc_pt1=pt1.encode()
                         f2.write(pt1)
                         j = j + 1
                     else:
@@ -340,7 +343,7 @@ def decryption(file, symlist):
                         f2.write(dec)
                         i += 1
                     if j == 4:
-                        f2.write("\n")
+                        f2.write("\n".encode())
                         co = co + 5
                         j = 0
             else:
@@ -406,8 +409,8 @@ def main():
     fk = open('KeyFile.txt', 'r+')
     fk.truncate(0)
 
-    #fk = open('OuterKeyFile.txt', 'r+')
-    #fk.truncate(0)
+    fk = open('OuterKeyFile.txt', 'r+')
+    fk.truncate(0)
 
 if __name__ == "__main__":
     main()
