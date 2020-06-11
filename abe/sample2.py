@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import re
 import base64
 import os
@@ -14,8 +15,8 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 import importlib
 
-pli = []        # list of P0000 files
-oli = []        # list of Temp files
+pli = []  # list of P0000 files
+oli = []  # list of Temp files
 innerkeyli = []
 mylines = []
 kli = []
@@ -27,6 +28,7 @@ cou = 0
 num = 0
 nu = 0
 n = 1
+iv = "                "
 
 
 def createList(str1, li1):
@@ -96,7 +98,7 @@ def innerEnc(input, kli):
     fk = open("InnerKeyFile.txt", 'a+')
 
     with open(input, 'r+') as myfile:
-        for myline in myfile:           # For each line, stored as myline,
+        for myline in myfile:  # For each line, stored as myline,
             mylines.append(myline)
     myfile.close()
 
@@ -147,7 +149,7 @@ def innerEnc(input, kli):
                 data = x.encode('utf-8')
                 encrypted = fernet.encrypt(data)
                 enc = encrypted.decode('utf-8')
-                print ("Inner Encryption: "+enc)
+                print("Inner Encryption: " + enc)
                 rl.append(enc + '\n')
                 j = j + 1
 
@@ -171,23 +173,23 @@ def innerEnc(input, kli):
 def outerKeyGen(output):
     mylines = []
     with open(output, 'r+') as myfile:
-        for myline in myfile:       # For each line, stored as myline,
+        for myline in myfile:  # For each line, stored as myline,
             mylines.append(myline)
 
         password = []
         pass_string = " "
 
-        k = mylines[2].find(":")    # PatientID
+        k = mylines[2].find(":")  # PatientID
         for i in range(k + 2, k + 8):
             password.append(mylines[2][i])
 
-        k = mylines[3].find(":") + 2    # First Name
+        k = mylines[3].find(":") + 2  # First Name
         password.append(mylines[3][k])
 
-        k = mylines[5].find(":") + 2    # Last Name
+        k = mylines[5].find(":") + 2  # Last Name
         password.append(mylines[5][k])
 
-        k = mylines[7].find(":")        # DOB
+        k = mylines[7].find(":")  # DOB
         for i in range(k + 2, k + 12):
             password.append(mylines[7][i])
 
@@ -198,7 +200,7 @@ def outerKeyGen(output):
             pass_string = pass_string + password[i]
 
         pass_string = ''.join(password)
-        print(("Outer key: "+pass_string))
+        print(("Outer key: " + pass_string))
         keys.append(pass_string)
 
     myfile.close()
@@ -220,19 +222,20 @@ class AESCipher:
 
     def encrypt(message, key):
         # The IV should always be random
+        global iv
         iv = Random.new().read(AES.block_size)
         cipher = AES.new(key, AES.MODE_CFB, iv)
         ciphertext = cipher.encrypt(message.encode("utf-8"))
         return (ciphertext, iv)
 
     def decrypt(ciphertext, key, iv):
-        cipher = AES.new(key, AES.MODE_CFB, iv)
+        cipher = AES.new(key, AES.MODE_CFB, iv.encode())
         msg = cipher.decrypt(ciphertext).decode("latin-1")
         return msg
 
 
 def outerEnc(output, pass_string):
-    global e,iv,salt
+    global e, iv, salt
     fk = open("OuterKeyFile.txt", 'a+')
     fk.write(pass_string)
 
@@ -240,14 +243,13 @@ def outerEnc(output, pass_string):
 
     with open(output, 'r+') as f:
         data = f.read()
-    print("Encrypted file: "+data)
+    print("Encrypted file: " + data)
     key, salt = AESCipher.make_key(pass_string)
     encrypted, iv = AESCipher.encrypt(data, key)
     print(("Outer Encryption: " + encrypted.decode("latin-1")))
     f.close()
-    f=open(output_file,"wb")
+    f = open(output_file, "wb")
     f.write(encrypted)
-
 
     e = e + 1
 
@@ -259,13 +261,15 @@ def outerEnc(output, pass_string):
 def decryption(file, symlist):
     def outerDec(file, symlist):
         print("Inside Outer Decryption")
-        global salt,iv
+        global salt, iv
         ln = -1
-        num = int(file[8:14])
-        k = oli[num - 1]
+        num = int(file[9:14])
+        num1 = int(file[11:14])
+        k = "Temp" + str(num1) + ".txt"
+        # k = oli[num - 1]
         pass_str = []
 
-        fk = open("OuterKeyFile.txt", "r")
+        fk = open("./abe/OuterKeyFile.txt", "r")
         x = fk.readlines()
 
         for p in x:
@@ -276,9 +280,10 @@ def decryption(file, symlist):
         print(("Outerkey :", pass_str))
         with open(file, 'rb') as f:
             encrypted = f.read()
-# salt and iv must be stored somewhere
-        #encrypted=encrypted.decode("latin-1")
-        print("Encrypted: "+encrypted.decode("latin-1"))
+        # salt and iv must be stored somewhere
+        # encrypted=encrypted.decode("latin-1")
+        salt = os.urandom(16)
+        print("Encrypted: " + encrypted.decode("latin-1"))
         key, _ = AESCipher.make_key(pass_str, salt)
         decrypted = AESCipher.decrypt(encrypted, key, iv)
         print(("Outer Decrypted: " + decrypted))
@@ -302,14 +307,17 @@ def decryption(file, symlist):
         ln = -1
         c = co
         co += 1
-        modulo(file)
-        output = pli[num - 1]
+        # modulo(file)
+        num1 = int(file[4:5])
+        output = ".\media\P0000" + str(num1) + ".txt"
+        # output = pli[num - 1]
 
         ft = open(output, 'r+')
         ft.truncate(0)
         ft.close()
 
-        fk = open("InnerKeyFile.txt", "r")
+        fk = open(".\\abe\InnerKeyFile.txt", "r")
+
         x = fk.readlines()
 
         print(("nu: ", nu))
@@ -329,7 +337,7 @@ def decryption(file, symlist):
             lin += 1
             if lin == (co + 1):
                 line = pt.decode("utf-8")
-                print("line: "+line)
+                print("line: " + line)
                 for sym in symlist:
                     if sym.lower() in line.lower():
                         paranum.append(co)
@@ -339,7 +347,7 @@ def decryption(file, symlist):
         co = c + 1
         lin = 0
         for pt1 in dat:
-            #pt1=pt1.decode("utf-8")
+            # pt1=pt1.decode("utf-8")
             lin += 1
             if co in paranum:
                 if lin == (co + j):
@@ -350,7 +358,7 @@ def decryption(file, symlist):
                         j = j + 1
                         fernet = Fernet(innerkeyli[i])
                         dec = fernet.decrypt(pt1)
-                        print ("Inner decrypted: "+dec.decode("utf-8"))
+                        print("Inner decrypted: " + dec.decode("utf-8"))
                         f2.write(dec)
                         i += 1
                     if j == 4:
@@ -377,55 +385,55 @@ def download_file(file):
 def main():
     global e
 
-    #importlib.reload(sys)
-#    sys.setdefaultencoding('utf-8')
+    # importlib.reload(sys)
+    #    sys.setdefaultencoding('utf-8')
 
     st = "P0000"
     createList(st, pli)
     st = "Temp00"
     createList(st, oli)
 
-    for inp in pli:             # Inner Encryption
+    for inp in pli:  # Inner Encryption
         innerKeyGen(inp)
         innerEnc(inp, kli)
-        #print(("Inner Encryption using Fernet is done on "+inp))
+        # print(("Inner Encryption using Fernet is done on "+inp))
 
-    for ff in pli:              # Clearing P0000 files
+    for ff in pli:  # Clearing P0000 files
         ft = open(ff, 'r+')
         ft.truncate(0)
         ft.close()
 
-    for oup in oli:             # Outer Encryption and upload
+    for oup in oli:  # Outer Encryption and upload
         ipp = pli[e]
         outerKeyGen(oup)
-        #print(("Outer Encryption using AES 256 is done on "+ipp))
+        # print(("Outer Encryption using AES 256 is done on "+ipp))
         upload_file(ipp)
-        #print((ipp+" was uploaded successfully!"))
+        # print((ipp+" was uploaded successfully!"))
 
-    for ff in oli:              # Removing Temp00 Files
+    for ff in oli:  # Removing Temp00 Files
         os.remove(ff)
 
-    for ff in pli:              # Removing P0000 Files
+    for ff in pli:  # Removing P0000 Files
         os.remove(ff)
 
-    #while True:                 # Download and Decryption
-        #fil = str(input("Enter the record name: "))
+        # while True:                 # Download and Decryption
+        # fil = str(input("Enter the record name: "))
         fil = fil + ".txt"
-        #st = str(input("Enter the symptom list: "))
+        # st = str(input("Enter the symptom list: "))
         symlist = st.split(",")
-        #for l in symlist:
-            #print(("Symlist: " + l))
+        # for l in symlist:
+        # print(("Symlist: " + l))
         download_file(fil)
         decryption(fil, symlist)
-        #ch = int(input("Enter 1 to continue: "))
-        #if ch != 1:
-           # break
+        # ch = int(input("Enter 1 to continue: "))
+        # if ch != 1:
+        # break
 
-    fk = open('InnerKeyFile.txt', 'r+')
-    fk.truncate(0)
+    # fk = open('InnerKeyFile.txt', 'r+')
+    # fk.truncate(0)
 
-    fk = open('OuterKeyFile.txt', 'r+')
-    fk.truncate(0)
+    # fk = open('OuterKeyFile.txt', 'r+')
+    # fk.truncate(0)
 
 
 if __name__ == "__main__":

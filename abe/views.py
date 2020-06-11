@@ -1,8 +1,10 @@
+import sys
+
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
-from abe.sample1 import decryption
-
+from abe.sample3 import decryption
+import time
 
 import boto3
 import botocore
@@ -46,17 +48,19 @@ def result(request):
         s3 = boto3.resource('s3')
         bucket = s3.Bucket('abemedicalrecords')
 
-        data = open("./media/"+pid+".txt", 'wb')
+        #data = open(".\\abe\\"+pid+".txt", 'wb')
         try:
-            bucket.download_fileobj(pid+".txt", data)
-            print("hi")
+            #bucket.download_fileobj(pid+".txt", data)
+            time.sleep(5)
+            print(pid+" downloaded successfully")
         except:
-            data.close()
-            #return render(request, 'result.html', {'ans': "file not found"})
-        #decryption("./media/"+pid+".txt",symptom)
+            #data.close()
+            return render(request, 'result.html', {'ans': "file not found"})
+        #exec(open('decryption.py).read())
+        decryption("C:\\Users\\MyPc\\PycharmProjects\\MainProject\\media\\"+pid+".txt",symptom)
+        #decryption(".\media\\"+pid+".txt",symptom)
 
-        data.close()
-
+        #data.close()
 
         print(patientid, symptom)
         return render(request, 'result.html', {'ans': patientid + "with " + symptom})

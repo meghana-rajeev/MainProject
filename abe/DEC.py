@@ -13,7 +13,7 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from importlib import reload
 
-from abe.abe import innerEnc
+from abe.aoldbe import innerEnc
 
 pli = []  # list of P0000 files
 oli = []  # list of Temp files
