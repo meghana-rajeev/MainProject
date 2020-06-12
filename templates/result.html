@@ -1,24 +1,33 @@
 {% load static %}
 <html>
+<title> RESULT </title>
  <body background="/static/images/m2.jpg">
   <font color="white">
       <br>
+<center>
 <h1>RESULT </h1>
 
 <br>
 <br>
 <br>
 
+<h2>
 
-<h2 >
-    <font color="white">
-    The medical record corrosponding to
+    <font color="white" style="font-family:'verdana'">
+
 {% if ans %}
 {{ans}}
 {% endif %}
-    is successfully downloaded.
+    is successfully downloaded
+        <br>
+        <br>
+        <br>
+
 </font>
 </h2>
-      <a href="{% url 'search' %}">refer another patient</a>
-</body>
+  <h3>  <font color="white"> <a href="{% url 'search' %}" style="color:white">Refer another patient record</a> </font>
+</h3>
+</center>
+ </body>
+
 </html>

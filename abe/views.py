@@ -48,22 +48,24 @@ def result(request):
         s3 = boto3.resource('s3')
         bucket = s3.Bucket('abemedicalrecords')
 
-        #data = open(".\\abe\\"+pid+".txt", 'wb')
+        data = open(".\\abe\\"+pid+".txt", 'wb')
         try:
-            #bucket.download_fileobj(pid+".txt", data)
+            bucket.download_fileobj(pid+".txt", data)
             time.sleep(5)
             print(pid+" downloaded successfully")
         except:
-            #data.close()
+            data.close()
             return render(request, 'result.html', {'ans': "file not found"})
         #exec(open('decryption.py).read())
-        decryption("C:\\Users\\MyPc\\PycharmProjects\\MainProject\\media\\"+pid+".txt",symptom)
+        data.close()
+        decryption(".\\abe\\"+pid+".txt",symptom)
         #decryption(".\media\\"+pid+".txt",symptom)
 
         #data.close()
 
         print(patientid, symptom)
-        return render(request, 'result.html', {'ans': patientid + "with " + symptom})
+
+        return render(request, 'result.html', {'ans': patientid + " with " + symptom})
         #return render(request, 'result.html', {'ans': patientid })
     return render(request, 'result.html', {})
 
