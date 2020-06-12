@@ -1,0 +1,36 @@
+{% load static %}
+<!doctype html>
+
+<html>
+	<head>
+		<title>Login Page</title>
+		<link rel="stylesheet" href="/static/style.css">
+	
+
+	</head>
+
+	<body>
+
+	<div class="loginBox">
+		
+		<img src="/static/images/doctor.png" class="user">
+		<h2>Login Here</h2>
+		<form action="{% url 'home' %}" method="post">
+        {% csrf_token %}
+			<p>Doctor ID</p>
+			<input type="text" name = "drid" placeholder="Enter Doctor ID" required>
+			<p>Password</p>
+			<input type="password" name = "psw" placeholder="Enter Password" required>
+			{% if error %}
+    <div class="alert">
+    <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+    <font color="white"> Invalid Doctor ID or Password !! <font>
+    </div>
+    {% endif %}
+			<input type="submit" value="Login">
+			<a href="#"> Forgot Password?</a> 
+			
+		</form>
+	</div>
+	</body>
+</html>

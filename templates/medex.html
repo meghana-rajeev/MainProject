@@ -1,0 +1,29 @@
+{% load static %}
+<!doctype html>
+
+<html>
+	<head>
+		<title>MEDEX ABE</title>
+		<link rel="stylesheet" href="/static/style1.css">
+	
+
+	</head>
+	<body>
+	<div class="loginBox">
+		
+		<img src="https://cdn.clipart.email/a7c373da3dd0234832c40220e6cf171d_godinspiredartquotes-page-2-god-art-inspiration_1350-1535.gif" class="user">
+		
+		<h1>MEDEX ABE</h1><br>
+		<form class="main" method="post"  action="{% url 'result' %}" >
+			{% csrf_token %}
+			<p>Patient ID</p>
+			<input type="text" name = "pid" placeholder="Enter Patient ID" required>
+			<p>Symptoms</p>
+			<input type="text" name = "sym" placeholder="Enter Symptoms" required>
+			<input type="submit" value="Submit">
+			 
+			
+		</form>
+	</div>
+	</body>
+</html>
